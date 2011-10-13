@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <getopt.h>
 #include <string.h>
+#include <stdarg.h>
 
 #include "../lib/libwebsockets.h"
 

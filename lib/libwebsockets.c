@@ -22,7 +22,8 @@
 #include "private-libwebsockets.h"
 
 #ifdef WIN32
-
+#define sys_nerr _sys_nerr
+#define sys_errlist _sys_errlist
 #else
 #include <ifaddrs.h>
 #include <sys/un.h>
@@ -457,9 +458,9 @@ libwebsockets_get_peer_addresses(int fd, char *name, int name_len,
 	len = sizeof sin;
 	if (getpeername(fd, (struct sockaddr *) &sin, &len) < 0) {
 		//perror("getpeername");
-        if (errno < _sys_nerr)
+        if (errno < sys_nerr)
         {
-            lws_log(LWS_LOG_ERROR, "getpeername: %s", _sys_errlist[errno]);
+            lws_log(LWS_LOG_ERROR, "getpeername: %s", sys_errlist[errno]);
         }
 		return;
 	}
@@ -468,9 +469,9 @@ libwebsockets_get_peer_addresses(int fd, char *name, int name_len,
 								       AF_INET);
 	if (host == NULL) {
 		//perror("gethostbyaddr");
-        if (errno < _sys_nerr)
+        if (errno < sys_nerr)
         {
-            lws_log(LWS_LOG_ERROR, "gethostbyaddr: %s", _sys_errlist[errno]);
+            lws_log(LWS_LOG_ERROR, "gethostbyaddr: %s", sys_errlist[errno]);
         }
 		return;
 	}
