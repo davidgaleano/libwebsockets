@@ -1220,7 +1220,7 @@ spill:
 
 		default:
 
-			lws_log(LWS_LOG_WARNING, "Reserved opcode 0x%2X", wsi->opcode);
+			lws_log(LWS_LOG_DEBUG, "Reserved opcode 0x%2X", wsi->opcode);
 			/*
 			 * It's something special we can't understand here.
 			 * Pass the payload up to the extension's parsing
@@ -1511,7 +1511,7 @@ lws_issue_raw_ext_access(struct libwebsocket *wsi,
 			/* no we could add more */
 			continue;
 
-		lws_log(LWS_LOG_WARNING, "choked");
+		lws_log(LWS_LOG_DEBUG, "choked");
 
 		/*
 		 * Yes, he's choked.  Don't spill the rest now get a callback
