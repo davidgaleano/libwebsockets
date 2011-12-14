@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.66])
+AC_PREREQ([2.61])
 AC_INIT(libwebsockets, 0.3, andy@warmcat.com)
 AC_CONFIG_SRCDIR([test-server/test-server.c])
 AC_CONFIG_HEADERS([config.h])
@@ -99,7 +99,7 @@ AM_CONDITIONAL(NOPING, test x$noping = xyes)
 
 
 # Checks for header files.
-AC_CHECK_HEADERS([zlib.h fcntl.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h])
+AC_CHECK_HEADERS([zlib.h fcntl.h netinet/in.h stdlib.h string.h sys/socket.h unistd.h sys/prctl.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_TYPE_SIZE_T
