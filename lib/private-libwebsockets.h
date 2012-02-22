@@ -81,15 +81,15 @@
 
 #ifdef DEBUG
 #ifdef WIN32
-static
+#define debug(...) lws_log(LWS_LOG_DEBUG, __VA_ARGS__)
 #else
 static inline
-#endif
 void debug(const char *format, ...)
 {
 	va_list ap;
 	va_start(ap, format); vfprintf(stderr, format, ap); va_end(ap);
 }
+#endif
 #else
 #ifdef WIN32
 static
