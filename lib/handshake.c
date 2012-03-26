@@ -352,9 +352,6 @@ handshake_0405(struct libwebsocket_context *context, struct libwebsocket *wsi)
 	 */
 
 	if (wsi->utf8_token[WSI_TOKEN_EXTENSIONS].token_len) {
-		strcpy(p,   "\x0d\x0aSec-WebSocket-Extensions: ");
-		p += strlen("\x0d\x0aSec-WebSocket-Extensions: ");
-
 		/*
 		 * break down the list of client extensions
 		 * and go through them
@@ -421,7 +418,14 @@ handshake_0405(struct libwebsocket_context *context, struct libwebsocket *wsi)
 				/* apply it */
 				
 				if (ext_count)
+				{
 					*p++ = ',';
+				}
+				else
+				{
+					strcpy(p,   "\x0d\x0aSec-WebSocket-Extensions: ");
+					p += strlen("\x0d\x0aSec-WebSocket-Extensions: ");
+				}
 				p += sprintf(p, "%s", ext_name);
 				ext_count++;
 
