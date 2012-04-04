@@ -312,6 +312,35 @@ This is useful to get the protocol to broadcast back to from inside
 the callback.
 </blockquote>
 <hr>
+<h2>libwebsockets_set_external_user_space - Sets an external pointer as user space for a websocket connection.</h2>
+<i>void</i>
+<b>libwebsockets_set_external_user_space</b>
+(<i>struct libwebsocket *</i> <b>wsi</b>,
+<i>void *</i> <b>external_user_space</b>)
+<h3>Arguments</h3>
+<dl>
+<dt><b>wsi</b>
+<dd>pointer to struct websocket you want to set user space to
+<dt><b>external_user_space</b>
+<dd>pointer to external user space to set
+</dl>
+<hr>
+<h2>libwebsockets_get_external_user_space - Gets the external pointer user space for a websocket connection.</h2>
+<i>void *</i>
+<b>libwebsockets_get_external_user_space</b>
+(<i>const struct libwebsocket *</i> <b>wsi</b>)
+<h3>Arguments</h3>
+<dl>
+<dt><b>wsi</b>
+<dd>pointer to struct websocket you want to get user space to
+</dl>
+<h3>Description</h3>
+<blockquote>
+<b>libwebsockets_get_external_user_space</b> returns NULL if
+<b>libwebsockets_set_external_user_space</b> was not ever called on the
+websocket connection.
+</blockquote>
+<hr>
 <h2>libwebsockets_broadcast - Sends a buffer to the callback for all active connections of the given protocol.</h2>
 <i>int</i>
 <b>libwebsockets_broadcast</b>
@@ -342,6 +371,16 @@ should call <b>libwebsocket_write</b>.
 having to take any care about data visibility between the processes, it'll
 "just work".
 </blockquote>
+<hr>
+<h2>libwebsockets_set_log_callback - Sets the callback to be called for logging.</h2>
+<i>void</i>
+<b>libwebsockets_set_log_callback</b>
+(<i>libwebsocket_log_callback</i> <b>log_callback</b>)
+<h3>Arguments</h3>
+<dl>
+<dt><b>log_callback</b>
+<dd>callback function to call for logging
+</dl>
 <hr>
 <h2>libwebsocket_write - Apply protocol then write data to client</h2>
 <i>int</i>
