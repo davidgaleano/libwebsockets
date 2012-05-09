@@ -2004,7 +2004,10 @@ bail3:
 		if (eff_buf.token_len < 0) {
 			lws_log(LWS_LOG_INFO, "Socket read returned %d",
 							    eff_buf.token_len);
-			break;
+			if (errno != EINTR)
+				libwebsocket_close_and_free_session(context, wsi,
+								 LWS_CLOSE_STATUS_NOSTATUS);
+			return 1;
 		}
 		if (!eff_buf.token_len) {
 			libwebsocket_close_and_free_session(context, wsi,
