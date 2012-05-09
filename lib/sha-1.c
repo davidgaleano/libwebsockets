@@ -62,6 +62,7 @@ typedef void* caddr_t;
 #define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
 
 #else
+#include <sys/stat.h>
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #endif
