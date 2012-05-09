@@ -45,6 +45,8 @@
 
 #define strcasecmp stricmp
 
+typedef int ssize_t;
+
 #else
 
 #include <sys/types.h>
