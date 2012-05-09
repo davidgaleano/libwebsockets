@@ -548,6 +548,11 @@ LWS_CALLBACK_ESTABLISHED reason.
 after the server completes a handshake with
 an incoming client
 </blockquote>
+<h3>LWS_CALLBACK_CLIENT_CONNECTION_ERROR</h3>
+<blockquote>
+the request client connection has
+been unable to complete a handshake with the remote server
+</blockquote>
 <h3>LWS_CALLBACK_CLIENT_ESTABLISHED</h3>
 <blockquote>
 after your client connection completed
@@ -769,7 +774,7 @@ internal polling loop, you can just ignore it.
 (<i>struct libwebsocket_context *</i> <b>context</b>,
 <i>struct libwebsocket_extension *</i> <b>ext</b>,
 <i>struct libwebsocket *</i> <b>wsi</b>,
-<i>enum libwebsocket_callback_reasons</i> <b>reason</b>,
+<i>enum libwebsocket_extension_callback_reasons</i> <b>reason</b>,
 <i>void *</i> <b>user</b>,
 <i>void *</i> <b>in</b>,
 <i>size_t</i> <b>len</b>)
@@ -854,7 +859,7 @@ set the lws_tokens token pointer to it.
 <h2>struct libwebsocket_protocols - List of protocols and handlers server supports.</h2>
 <b>struct libwebsocket_protocols</b> {<br>
 &nbsp; &nbsp; <i>const char *</i> <b>name</b>;<br>
-&nbsp; &nbsp; <i>int (*</i><b>callback</b>) <i>(struct libwebsocket_context * context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)</i>;<br>
+&nbsp; &nbsp; <i>callback_function *</i> <b>callback</b>;<br>
 &nbsp; &nbsp; <i>size_t</i> <b>per_session_data_size</b>;<br>
 &nbsp; &nbsp; <i>struct libwebsocket_context *</i> <b>owning_server</b>;<br>
 &nbsp; &nbsp; <i>int</i> <b>broadcast_socket_port</b>;<br>
@@ -900,8 +905,9 @@ allows as many protocols as you like to be handled by one server.
 <h2>struct libwebsocket_extension - An extension we know how to cope with</h2>
 <b>struct libwebsocket_extension</b> {<br>
 &nbsp; &nbsp; <i>const char *</i> <b>name</b>;<br>
-&nbsp; &nbsp; <i>int (*</i><b>callback</b>) <i>(struct libwebsocket_context *context,struct libwebsocket_extension *ext,struct libwebsocket *wsi,enum libwebsocket_extension_callback_reasons reason,void *user, void *in, size_t len)</i>;<br>
+&nbsp; &nbsp; <i>extension_callback_function *</i> <b>callback</b>;<br>
 &nbsp; &nbsp; <i>size_t</i> <b>per_session_data_size</b>;<br>
+&nbsp; &nbsp; <i>void *</i> <b>per_context_private_data</b>;<br>
 };<br>
 <h3>Members</h3>
 <dl>
@@ -913,5 +919,9 @@ allows as many protocols as you like to be handled by one server.
 <dd>Libwebsockets will auto-malloc this much
 memory for the use of the extension, a pointer
 to it comes in the <tt><b>user</b></tt> callback parameter
+<dt><b>per_context_private_data</b>
+<dd>Optional storage for this externsion that
+is per-context, so it can track stuff across
+all sessions, etc, if it wants
 </dl>
 <hr>
