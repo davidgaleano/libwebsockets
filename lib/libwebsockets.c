@@ -1424,9 +1424,7 @@ check_accept:
 	wsi->state = WSI_STATE_ESTABLISHED;
 	wsi->mode = LWS_CONNMODE_WS_CLIENT;
 
-	lws_log(LWS_LOG_INFO,
-            "handshake OK for protocol %s",
-			wsi->protocol->name);
+	debug("handshake OK for protocol %s\n", wsi->protocol->name);
 
 	/* call him back to inform him he is up */
 
@@ -2871,7 +2869,7 @@ libwebsocket_create_context(int port, const char *interf,
 			protocols[context->count_protocols].callback;
 						   context->count_protocols++) {
 
-		lws_log(LWS_LOG_INFO, "  Protocol: %s", protocols[context->count_protocols].name);
+		debug("  Protocol: %s\n", protocols[context->count_protocols].name);
 
 		protocols[context->count_protocols].owning_server = context;
 		protocols[context->count_protocols].protocol_index =
@@ -2946,7 +2944,7 @@ libwebsocket_create_context(int port, const char *interf,
 	if (port)
 		m = LWS_EXT_CALLBACK_SERVER_CONTEXT_CONSTRUCT;
 	while (extensions && extensions->callback) {
-		lws_log(LWS_LOG_INFO, "  Extension: %s", extensions->name);
+		debug("  Extension: %s\n", extensions->name);
 		extensions->callback(context, extensions,
 							NULL, m, NULL, NULL, 0);
 		extensions++;
