@@ -470,7 +470,7 @@ int main(int argc, char **argv)
 
 	context = libwebsocket_create_context(port, interface, protocols,
 				libwebsocket_internal_extensions,
-				cert_path, key_path, -1, -1, opts);
+				cert_path, key_path, NULL, -1, -1, opts);
 	if (context == NULL) {
 		fprintf(stderr, "libwebsocket init failed\n");
 		return -1;
