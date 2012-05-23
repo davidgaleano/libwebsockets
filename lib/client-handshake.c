@@ -132,7 +132,10 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 	wsi->mode = LWS_CONNMODE_WS_CLIENT_ISSUE_HANDSHAKE;
 	pfd.fd = wsi->sock;
 	pfd.revents = POLLIN;
-	libwebsocket_service_fd(context, &pfd);
+	if (libwebsocket_service_fd(context, &pfd)) /* returns 1 on failure after closing wsi */
+	{
+		return NULL;
+	}
 
 	return wsi;
 
