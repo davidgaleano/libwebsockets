@@ -2500,6 +2500,8 @@ OpenSSL_verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx)
  *			server cert from, otherwise NULL for unencrypted
  * @ssl_private_key_filepath: filepath to private key if wanting SSL mode,
  *			else ignored
+ * @ssl_ca_filepath: filepath to CA certificates file if wanting SSL mode,
+ *			else ignored
  * @gid:	group id to change to after setting listen socket, or -1.
  * @uid:	user id to change to after setting listen socket, or -1.
  * @options:	0, or LWS_SERVER_OPTION_DEFEAT_CLIENT_MASK
