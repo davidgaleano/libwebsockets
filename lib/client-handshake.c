@@ -120,7 +120,7 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 		}
 
 		libwebsocket_set_timeout(wsi,
-			PENDING_TIMEOUT_AWAITING_PROXY_RESPONSE, 5);
+			PENDING_TIMEOUT_AWAITING_PROXY_RESPONSE, AWAITING_TIMEOUT);
 
 		wsi->mode = LWS_CONNMODE_WS_CLIENT_WAITING_PROXY_REPLY;
 
@@ -339,7 +339,7 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 							 "ext handling conn");
 
 		libwebsocket_set_timeout(wsi,
-			PENDING_TIMEOUT_AWAITING_EXTENSION_CONNECT_RESPONSE, 5);
+			PENDING_TIMEOUT_AWAITING_EXTENSION_CONNECT_RESPONSE, AWAITING_TIMEOUT);
 
 		wsi->mode = LWS_CONNMODE_WS_CLIENT_WAITING_EXTENSION_CONNECT;
 		return wsi;
