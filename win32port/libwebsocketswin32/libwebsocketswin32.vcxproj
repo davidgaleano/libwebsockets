@@ -253,6 +253,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\lib\base64-decode.c" />
     <ClCompile Include="..\..\lib\client-handshake.c" />
+    <ClCompile Include="..\..\lib\extension-deflate-frame.c" />
     <ClCompile Include="..\..\lib\extension-deflate-stream.c" />
     <ClCompile Include="..\..\lib\extension.c" />
     <ClCompile Include="..\..\lib\handshake.c" />
@@ -264,6 +265,7 @@
     <ClCompile Include="..\win32helpers\websock-w32.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\lib\extension-deflate-frame.h" />
     <ClInclude Include="..\..\lib\extension-deflate-stream.h" />
     <ClInclude Include="..\..\lib\extension-x-google-mux.h" />
     <ClInclude Include="..\..\lib\libwebsockets.h" />
