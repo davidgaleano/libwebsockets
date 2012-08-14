@@ -17,9 +17,11 @@ int lws_extension_callback_deflate_frame(
 	struct lws_ext_deflate_frame_conn *conn =
 					 (struct lws_ext_deflate_frame_conn *)user;
 	struct lws_tokens *eff_buf = (struct lws_tokens *)in;
+	size_t current_payload, remaining_payload, total_payload;
 	int n;
 
-	switch (reason) {
+	switch (reason)
+	{
 
 	/*
 	 * for deflate-frame, both client and server sides act the same
@@ -31,33 +33,44 @@ int lws_extension_callback_deflate_frame(
 		conn->zs_in.zfree = conn->zs_out.zfree = Z_NULL;
 		conn->zs_in.opaque = conn->zs_out.opaque = Z_NULL;
 		n = inflateInit2(&conn->zs_in, -LWS_ZLIB_WINDOW_BITS);
-		if (n != Z_OK) {
+		if (n != Z_OK)
+		{
 			lws_log(LWS_LOG_WARNING, "deflateInit returned %d", n);
 			return 1;
 		}
 		n = deflateInit2(&conn->zs_out,
 				 DEFLATE_FRAME_COMPRESSION_LEVEL, Z_DEFLATED,
 				 -LWS_ZLIB_WINDOW_BITS, LWS_ZLIB_MEMLEVEL,
-								Z_DEFAULT_STRATEGY);
-		if (n != Z_OK) {
+				 Z_DEFAULT_STRATEGY);
+		if (n != Z_OK)
+		{
 			lws_log(LWS_LOG_WARNING, "deflateInit returned %d", n);
 			return 1;
 		}
+		conn->buf_pre_used = 0;
+		conn->buf_pre_length = 0;
 		conn->buf_in_length = MAX_USER_RX_BUFFER;
 		conn->buf_out_length = MAX_USER_RX_BUFFER;
 		conn->compressed_out = 0;
+		conn->buf_pre = NULL;
 		conn->buf_in = (unsigned char *)malloc(LWS_SEND_BUFFER_PRE_PADDING +
-											   conn->buf_in_length +
-											   LWS_SEND_BUFFER_POST_PADDING);
+						       conn->buf_in_length +
+						       LWS_SEND_BUFFER_POST_PADDING);
 		conn->buf_out = (unsigned char *)malloc(LWS_SEND_BUFFER_PRE_PADDING +
-												conn->buf_out_length +
-												LWS_SEND_BUFFER_POST_PADDING);
+							conn->buf_out_length +
+							LWS_SEND_BUFFER_POST_PADDING);
 		lws_log(LWS_LOG_DEBUG, "zlibs constructed");
 		break;
 
 	case LWS_EXT_CALLBACK_DESTROY:
+		if (conn->buf_pre)
+		{
+			free(conn->buf_pre);
+		}
 		free(conn->buf_in);
 		free(conn->buf_out);
+		conn->buf_pre_used = 0;
+		conn->buf_pre_length = 0;
 		conn->buf_in_length = 0;
 		conn->buf_out_length = 0;
 		conn->compressed_out = 0;
@@ -67,20 +80,64 @@ int lws_extension_callback_deflate_frame(
 		break;
 
 	case LWS_EXT_CALLBACK_PAYLOAD_RX:
-		if ((libwebsocket_get_reserved_bits(wsi) & 0x40) == 0)
+		if ((wsi->rsv & 0x40) == 0)
+		{
 			return 0;
+		}
 
 		/*
 		 * inflate the incoming payload
 		 */
-		conn->zs_in.next_in = (unsigned char *)eff_buf->token;
-		conn->zs_in.avail_in = eff_buf->token_len;
+		current_payload = eff_buf->token_len;
 
-		conn->zs_in.next_in[eff_buf->token_len + 0] = 0;
-		conn->zs_in.next_in[eff_buf->token_len + 1] = 0;
-		conn->zs_in.next_in[eff_buf->token_len + 2] = 0xff;
-		conn->zs_in.next_in[eff_buf->token_len + 3] = 0xff;
-		conn->zs_in.avail_in += 4;
+		remaining_payload = wsi->rx_packet_length;
+		if (remaining_payload)
+		{
+			total_payload = conn->buf_pre_used +
+					current_payload +
+					remaining_payload;
+
+			if (conn->buf_pre_length < total_payload)
+			{
+				conn->buf_pre_length = total_payload;
+				if (conn->buf_pre)
+				{
+					free(conn->buf_pre);
+				}
+				conn->buf_pre = (unsigned char *)malloc(total_payload + 4);
+			}
+
+			memcpy(conn->buf_pre + conn->buf_pre_used, eff_buf->token, current_payload);
+			conn->buf_pre_used += current_payload;
+
+			eff_buf->token = NULL;
+			eff_buf->token_len = 0;
+
+			return 0;
+		}
+		else if (conn->buf_pre_used)
+		{
+			total_payload = conn->buf_pre_used +
+					current_payload;
+
+			memcpy(conn->buf_pre + conn->buf_pre_used, eff_buf->token, current_payload);
+			conn->buf_pre_used = 0;
+
+			conn->zs_in.next_in = conn->buf_pre;
+		}
+		else
+		{
+			total_payload = current_payload;
+
+			conn->zs_in.next_in = (unsigned char *)eff_buf->token;
+		}
+
+		conn->zs_in.next_in[total_payload + 0] = 0;
+		conn->zs_in.next_in[total_payload + 1] = 0;
+		conn->zs_in.next_in[total_payload + 2] = 0xff;
+		conn->zs_in.next_in[total_payload + 3] = 0xff;
+
+		conn->zs_in.avail_in = total_payload + 4;
 
 		conn->zs_in.next_out = conn->buf_in + LWS_SEND_BUFFER_PRE_PADDING;
 		conn->zs_in.avail_out = conn->buf_in_length;
@@ -88,7 +145,8 @@ int lws_extension_callback_deflate_frame(
 		while (1)
 		{
 			n = inflate(&conn->zs_in, Z_SYNC_FLUSH);
-			switch (n) {
+			switch (n)
+			{
 			case Z_NEED_DICT:
 			case Z_DATA_ERROR:
 			case Z_MEM_ERROR:
@@ -141,7 +199,8 @@ int lws_extension_callback_deflate_frame(
 		while (1)
 		{
 			n = deflate(&conn->zs_out, Z_SYNC_FLUSH);
-			if (n == Z_STREAM_ERROR) {
+			if (n == Z_STREAM_ERROR)
+			{
 				/*
 				 * screwed.. close the connection... we will get a
 				 * destroy callback to take care of closing nicely
@@ -151,7 +210,7 @@ int lws_extension_callback_deflate_frame(
 				return -1;
 			}
 
-			if (conn->zs_out.avail_in > 0)
+			if (conn->zs_out.avail_out == 0)
 			{
 				size_t len_so_far = (conn->zs_out.next_out - (conn->buf_out + LWS_SEND_BUFFER_PRE_PADDING));
 				unsigned char *new_buf;
