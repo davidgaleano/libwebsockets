@@ -114,7 +114,7 @@ int libwebsocket_parse(struct libwebsocket *wsi, unsigned char c)
 			wsi->utf8_token[wsi->parser_state].token[
 			   wsi->utf8_token[wsi->parser_state].token_len] = '\0';
 			wsi->parser_state = WSI_TOKEN_SKIPPING_SAW_CR;
-			lws_log(LWS_LOG_DEBUG, "*");
+			debug("*\n");
 			break;
 		}
 
