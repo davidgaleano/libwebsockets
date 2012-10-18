@@ -76,6 +76,11 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 	tv.tv_usec = 100 * 1000;
 	setsockopt(wsi->sock, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof tv);
 
+	/* Set sendind timeout */
+	tv.tv_sec = 0;
+	tv.tv_usec = 100 * 1000;
+	setsockopt(wsi->sock, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof tv);
+
 	if (connect(wsi->sock, (struct sockaddr *)&server_addr,
 					      sizeof(struct sockaddr)) == -1)  {
 		lws_log(LWS_LOG_WARNING, "Connect failed");

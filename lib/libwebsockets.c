@@ -1577,6 +1577,11 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
         setsockopt(accept_fd, IPPROTO_TCP, TCP_NODELAY, (const void *)&opt,
 				sizeof(opt));
 
+		/* Set sendind timeout */
+		tv.tv_sec = 0;
+		tv.tv_usec = 100 * 1000;
+		setsockopt(accept_fd, SOL_SOCKET, SO_SNDTIMEO, (char *)&tv, sizeof tv);
+
 		/*
 		 * look at who we connected to and give user code a chance
 		 * to reject based on client IP.  There's no protocol selected
