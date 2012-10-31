@@ -252,6 +252,7 @@ libwebsockets_test_fraggle_CFLAGS := -Wall -Werror -std=gnu99 -pedantic -DDATADI
 @NOPING_FALSE@libwebsockets_test_ping_SOURCES = test-ping.c
 @NOPING_FALSE@libwebsockets_test_ping_LDADD = -L../lib -lwebsockets
 @NOPING_FALSE@libwebsockets_test_ping_CFLAGS := -Wall -Werror -std=gnu99 -pedantic -DDATADIR=\"@datadir@\" -DLWS_OPENSSL_CLIENT_CERTS=\"@clientcertdir@\"
+EXTRA_DIST = test.html favicon.ico
 all: all-am
 
 .SUFFIXES:
