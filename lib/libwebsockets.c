@@ -197,7 +197,7 @@ libwebsocket_close_and_free_session(struct libwebsocket_context *context,
 		 */
 
 		if (m) {
-			lws_log(LWS_LOG_INFO, "extension vetoed close");
+			lws_log(LWS_LOG_DEBUG, "extension vetoed close");
 			return;
 		}
 	}
@@ -263,7 +263,7 @@ libwebsocket_close_and_free_session(struct libwebsocket_context *context,
 	if (old_state == WSI_STATE_ESTABLISHED &&
 					  reason != LWS_CLOSE_STATUS_NOSTATUS) {
 
-		lws_log(LWS_LOG_INFO, "sending close indication...");
+		lws_log(LWS_LOG_DEBUG, "sending close indication...");
 
 		n = libwebsocket_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING],
 							    0, LWS_WRITE_CLOSE);
@@ -280,7 +280,7 @@ libwebsocket_close_and_free_session(struct libwebsocket_context *context,
 			libwebsocket_set_timeout(wsi,
 						  PENDING_TIMEOUT_CLOSE_ACK, 5);
 
-			lws_log(LWS_LOG_INFO, "sent close indication, awaiting ack");
+			lws_log(LWS_LOG_DEBUG, "sent close indication, awaiting ack");
 
 			return;
 		}
@@ -290,7 +290,7 @@ libwebsocket_close_and_free_session(struct libwebsocket_context *context,
 
 just_kill_connection:
 
-	lws_log(LWS_LOG_INFO,
+	lws_log(LWS_LOG_DEBUG,
             "libwebsocket_close_and_free_session: just_kill_connection");
 
 	/*
@@ -328,11 +328,11 @@ just_kill_connection:
 				((old_state == WSI_STATE_ESTABLISHED) ||
 				 (old_state == WSI_STATE_RETURNED_CLOSE_ALREADY) ||
 				 (old_state == WSI_STATE_AWAITING_CLOSE_ACK))) {
-		lws_log(LWS_LOG_INFO, "calling back CLOSED");
+		lws_log(LWS_LOG_DEBUG, "calling back CLOSED");
 		wsi->protocol->callback(context, wsi, LWS_CALLBACK_CLOSED,
 						      wsi->user_space, NULL, 0);
 	} else {
-		lws_log(LWS_LOG_INFO, "not calling back closed due to old_state=%d", old_state);
+		lws_log(LWS_LOG_DEBUG, "not calling back closed due to old_state=%d", old_state);
 	}
 
 	/* deallocate any active extension contexts */
@@ -680,7 +680,7 @@ lws_handle_POLLOUT_event(struct libwebsocket_context *context,
 			/* no we could add more */
 			continue;
 
-		lws_log(LWS_LOG_WARNING, "choked in POLLOUT service");
+		lws_log(LWS_LOG_DEBUG, "choked in POLLOUT service");
 
 		/*
 		 * Yes, he's choked.  Leave the POLLOUT masked on so we will
@@ -996,7 +996,7 @@ libwebsockets_generate_client_handshake(struct libwebsocket_context *context,
 		if (n) {
 
 			/* an extension vetos us */
-			lws_log(LWS_LOG_INFO, "ext %s vetoed", (char *)ext->name);
+			lws_log(LWS_LOG_DEBUG, "ext %s vetoed", (char *)ext->name);
 			ext++;
 			continue;
 		}
@@ -1054,7 +1054,7 @@ libwebsockets_generate_client_handshake(struct libwebsocket_context *context,
 
 issue_hdr:
 
-	lws_log(LWS_LOG_DEBUG, pkt);
+	//lws_log(LWS_LOG_DEBUG, pkt);
 
 	/* done with these now */
 
@@ -1196,9 +1196,9 @@ lws_client_interpret_server_handshake(struct libwebsocket_context *context,
 select_protocol:
 	pc = wsi->c_protocol;
 	if (pc == NULL)
-		lws_log(LWS_LOG_INFO, "lws_client_interpret_server_handshake: NULL c_protocol");
+		lws_log(LWS_LOG_DEBUG, "lws_client_interpret_server_handshake: NULL c_protocol");
 	else
-		lws_log(LWS_LOG_INFO, "lws_client_interpret_server_handshake: cPprotocol='%s'", pc);
+		lws_log(LWS_LOG_DEBUG, "lws_client_interpret_server_handshake: cPprotocol='%s'", pc);
 
 	/*
 	 * confirm the protocol the server wants to talk was in the list
@@ -1271,7 +1271,7 @@ select_protocol:
 	/* instantiate the accepted extensions */
 
 	if (!wsi->utf8_token[WSI_TOKEN_EXTENSIONS].token_len) {
-		lws_log(LWS_LOG_INFO, "no client extensions allowed by server");
+		lws_log(LWS_LOG_DEBUG, "no client extensions allowed by server");
 		goto check_accept;
 	}
 
@@ -1301,7 +1301,7 @@ select_protocol:
 
 		/* check we actually support it */
 
-		lws_log(LWS_LOG_INFO, "checking client ext %s", ext_name);
+		lws_log(LWS_LOG_DEBUG, "checking client ext %s", ext_name);
 
 		n = 0;
 		ext = wsi->protocol->owning_server->extensions;
@@ -1314,7 +1314,7 @@ select_protocol:
 
 			n = 1;
 
-			lws_log(LWS_LOG_INFO, "instantiating client ext %s", ext_name);
+			lws_log(LWS_LOG_DEBUG, "instantiating client ext %s", ext_name);
 
 			/* instantiate the extension on this conn */
 
@@ -1399,20 +1399,11 @@ check_accept:
 	accept_ok:
 
 	/* allocate the per-connection user memory (if any) */
-    if (wsi->is_user_space_external == 0)
-    {
-	    if (wsi->protocol->per_session_data_size) {
-		    wsi->user_space = malloc(
-				      wsi->protocol->per_session_data_size);
-		    if (wsi->user_space  == NULL) {
-			    lws_log(LWS_LOG_WARNING,
-                        "Out of memory for "
-					    "conn user space");
-			    goto bail2;
-		    }
-	    } else
-		    wsi->user_space = NULL;
-    }
+	if (wsi->is_user_space_external == 0)
+	{
+		if (wsi->protocol->per_session_data_size && !libwebsocket_ensure_user_space(wsi))
+			goto bail2;
+	}
 
 	/* clear his proxy connection timeout */
 
@@ -3185,4 +3176,21 @@ libwebsockets_set_log_callback(libwebsocket_log_callback log_callback)
     {
         lws_log = log_callback;
     }
+}
+
+void *
+libwebsocket_ensure_user_space(struct libwebsocket *wsi)
+{
+	/* allocate the per-connection user memory (if any) */
+
+	if (wsi->protocol->per_session_data_size && !wsi->user_space) {
+		wsi->user_space = malloc(
+				  wsi->protocol->per_session_data_size);
+		if (wsi->user_space  == NULL) {
+			lws_log(LWS_LOG_ERROR, "Out of memory for conn user space");
+			return NULL;
+		}
+		memset(wsi->user_space, 0, wsi->protocol->per_session_data_size);
+	}
+	return wsi->user_space;
 }
