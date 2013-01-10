@@ -109,7 +109,7 @@ void debug(const char *format, ...)
  * but happily have something equivalent in the SO_NOSIGPIPE flag.
  */
 #ifdef __APPLE__
-#define MSG_NOSIGNAL SO_NOSIGPIPE 
+#define MSG_NOSIGNAL SO_NOSIGPIPE
 #endif
 
 
@@ -125,6 +125,7 @@ void debug(const char *format, ...)
 #define LWS_MAX_EXTENSIONS_ACTIVE 10
 #define SPEC_LATEST_SUPPORTED 13
 #define AWAITING_TIMEOUT 5
+#define CIPHERS_LIST_STRING "DEFAULT"
 
 #define MAX_WEBSOCKET_04_KEY_LEN 128
 #define SYSTEM_RANDOM_FILEPATH "/dev/urandom"
@@ -246,7 +247,7 @@ struct libwebsocket_context {
 	unsigned long last_timeout_check_s;
 
 	int fd_random;
-	
+
 #ifdef LWS_OPENSSL_SUPPORT
 	int use_ssl;
 	SSL_CTX *ssl_ctx;
