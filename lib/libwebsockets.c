@@ -1994,7 +1994,7 @@ bail3:
 
 		if (pollfd->revents & (POLLERR | POLLHUP)) {
 
-			lws_log(LWS_LOG_INFO, "Session Socket %p (fd=%d) dead",
+			debug("Session Socket %p (fd=%d) dead\n",
 				(void *)wsi, pollfd->fd);
 
 			libwebsocket_close_and_free_session(context, wsi,
