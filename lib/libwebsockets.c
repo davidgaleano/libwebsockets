@@ -1572,6 +1572,10 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
 			break;
 		}
 
+		lws_log(LWS_LOG_DEBUG, "new connection %s:%u",
+			inet_ntoa(cli_addr.sin_addr),
+			ntohs(cli_addr.sin_port));
+
 		/* Disable Nagle */
 		opt = 1;
         setsockopt(accept_fd, IPPROTO_TCP, TCP_NODELAY, (const void *)&opt,
