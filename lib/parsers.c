@@ -1852,9 +1852,8 @@ send_raw:
 	fprintf(stderr, "\n");
 #endif
 
-	if (protocol == LWS_WRITE_HTTP) {
-		if (lws_issue_raw(wsi, (unsigned char *)buf - pre,
-							      len + pre + post))
+	if (protocol == LWS_WRITE_HTTP || wsi->count_active_extensions == 0) {
+		if (lws_issue_raw(wsi, buf - pre, len + pre + post))
 			return -1;
 
 		return 0;
