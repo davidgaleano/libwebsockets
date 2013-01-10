@@ -2100,7 +2100,7 @@ libwebsocket_context_destroy(struct libwebsocket_context *context)
 	m = LWS_EXT_CALLBACK_CLIENT_CONTEXT_DESTRUCT;
 	if (context->listen_port)
 		m = LWS_EXT_CALLBACK_SERVER_CONTEXT_DESTRUCT;
-	while (ext->callback) {
+	while (ext && ext->callback) {
 		ext->callback(context, ext, NULL, m, NULL, NULL, 0);
 		ext++;
 	}
@@ -2933,13 +2933,12 @@ libwebsocket_create_context(int port, const char *interf,
 	m = LWS_EXT_CALLBACK_CLIENT_CONTEXT_CONSTRUCT;
 	if (port)
 		m = LWS_EXT_CALLBACK_SERVER_CONTEXT_CONSTRUCT;
-	while (extensions->callback) {
+	while (extensions && extensions->callback) {
 		lws_log(LWS_LOG_INFO, "  Extension: %s", extensions->name);
 		extensions->callback(context, extensions,
 							NULL, m, NULL, NULL, 0);
 		extensions++;
 	}
-
 	return context;
 }
 
