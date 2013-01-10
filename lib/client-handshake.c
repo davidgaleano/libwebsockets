@@ -79,6 +79,11 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 	if (connect(wsi->sock, (struct sockaddr *)&server_addr,
 					      sizeof(struct sockaddr)) == -1)  {
 		lws_log(LWS_LOG_WARNING, "Connect failed");
+#ifdef WIN32
+		closesocket(wsi->sock);
+#else
+		close(wsi->sock);
+#endif
 		goto oom4;
 	}
 
