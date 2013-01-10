@@ -40,6 +40,9 @@
 #include <ws2ipdef.h>
 #include <windows.h>
 
+#include "websock-w32.h"
+#include "gettimeofday.h"
+
 #else
 
 #include <sys/types.h>
@@ -67,6 +70,8 @@
 
 
 #include "libwebsockets.h"
+
+#define strcasecmp stricmp
 
 #if 0
 #define DEBUG
@@ -334,6 +339,7 @@ struct libwebsocket {
 #endif
 
 	void *user_space;
+    int is_user_space_external;
 };
 
 extern int
@@ -428,3 +434,5 @@ void
 MD5(const unsigned char *input, int ilen, unsigned char *output);
 
 #endif
+
+extern libwebsocket_log_callback lws_log;

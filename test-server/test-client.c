@@ -27,11 +27,29 @@
 
 #include "../lib/libwebsockets.h"
 
+#ifdef WIN32
+#include "websock-w32.h"
+#include "gettimeofday.h"
+#endif
+
 static unsigned int opts;
 static int was_closed;
 static int deny_deflate;
 static int deny_mux;
 static struct libwebsocket *wsi_mirror;
+
+static void
+log_callback(enum libwebsocket_log_severity severity,
+                   const char *msg, ...)
+{
+    va_list va;
+    va_start(va, msg);
+
+    vfprintf(stderr, msg, va);
+    fputc('\n', stderr);
+
+    va_end(va);
+}
 
 /*
  * This demo shows how to connect multiple websockets simultaneously to a
@@ -247,6 +265,8 @@ int main(int argc, char **argv)
 		goto usage;
 
 	address = argv[optind];
+
+    libwebsockets_set_log_callback(log_callback);
 
 	/*
 	 * create the websockets context.  This tracks open connections and

@@ -251,6 +251,9 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalIncludeDirectories>../win32helpers</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_CONSOLE;LWS_DLL</PreprocessorDefinitions>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

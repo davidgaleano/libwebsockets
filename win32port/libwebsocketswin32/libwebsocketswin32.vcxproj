@@ -235,6 +235,9 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)libwebsockets_vc100-mt-s.lib</OutputFile>

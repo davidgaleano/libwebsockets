@@ -28,7 +28,29 @@
 
 #include "../lib/libwebsockets.h"
 
+#ifdef WIN32
+#include "websock-w32.h"
+#include "gettimeofday.h"
+#endif
+
+#ifndef DATADIR
+#define DATADIR "."
+#endif
+
 static int close_testing;
+
+static void
+log_callback(enum libwebsocket_log_severity severity,
+                   const char *msg, ...)
+{
+    va_list va;
+    va_start(va, msg);
+
+    vfprintf(stderr, msg, va);
+    fputc('\n', stderr);
+
+    va_end(va);
+}
 
 /*
  * This demo server shows how to use libwebsockets for one or more
@@ -442,6 +464,8 @@ int main(int argc, char **argv)
 
 	if (!use_ssl)
 		cert_path = key_path = NULL;
+
+    libwebsockets_set_log_callback(log_callback);
 
 	context = libwebsocket_create_context(port, interface, protocols,
 				libwebsocket_internal_extensions,

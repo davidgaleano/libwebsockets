@@ -33,11 +33,6 @@ extern "C" {
 #endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include "websock-w32.h"
-
-#include "gettimeofday.h"
-
-#define strcasecmp stricmp
 
 #ifdef LWS_DLL
 #ifdef LWS_INTERNAL
@@ -223,9 +218,20 @@ enum lws_close_status {
 	LWS_CLOSE_STATUS_PAYLOAD_TOO_LARGE = 1004,
 };
 
+
+enum libwebsocket_log_severity {
+	LWS_LOG_DEBUG = 0,
+    LWS_LOG_INFO = 1,
+    LWS_LOG_WARNING = 2,
+    LWS_LOG_ERROR = 3,
+};
+
 struct libwebsocket;
 struct libwebsocket_context;
 struct libwebsocket_extension;
+
+typedef void (*libwebsocket_log_callback)(enum libwebsocket_log_severity severity,
+                                          const char *msg, ...);
 
 /* document the generic callback (it's a fake prototype under this) */
 /**
@@ -633,6 +639,13 @@ libwebsockets_broadcast(const struct libwebsocket_protocols *protocol,
 LWS_EXTERN const struct libwebsocket_protocols *
 libwebsockets_get_protocol(struct libwebsocket *wsi);
 
+LWS_EXTERN void
+libwebsockets_set_external_user_space(struct libwebsocket *wsi,
+                                      void *external_user_space);
+
+LWS_EXTERN void *
+libwebsockets_get_external_user_space(const struct libwebsocket *wsi);
+
 LWS_EXTERN int
 libwebsocket_callback_on_writable(struct libwebsocket_context *context,
 						      struct libwebsocket *wsi);
@@ -696,6 +709,9 @@ LWS_EXTERN int
 lws_b64_decode_string(const char *in, char *out, int out_size);
 
 LWS_EXTERN struct libwebsocket_extension libwebsocket_internal_extensions[];
+
+LWS_EXTERN void
+libwebsockets_set_log_callback(libwebsocket_log_callback log_callback);
 
 #ifdef __cplusplus
 }

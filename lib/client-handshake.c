@@ -18,7 +18,7 @@ struct libwebsocket * __libwebsocket_client_connect_2(
     struct protoent* tcp_proto;
 #endif
 
-	fprintf(stderr, "__libwebsocket_client_connect_2\n");
+	lws_log(LWS_LOG_DEBUG, "__libwebsocket_client_connect_2");
 
 	wsi->candidate_children_list = NULL;
 
@@ -43,11 +43,11 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 	 * prepare the actual connection (to the proxy, if any)
 	 */
 
-	fprintf(stderr, "__libwebsocket_client_connect_2: address %s", wsi->c_address);
+	lws_log(LWS_LOG_DEBUG, "__libwebsocket_client_connect_2: address %s", wsi->c_address);
 
 	server_hostent = gethostbyname(wsi->c_address);
 	if (server_hostent == NULL) {
-		fprintf(stderr, "Unable to get host name from %s\n",
+		lws_log(LWS_LOG_WARNING, "Unable to get host name from %s",
 								wsi->c_address);
 		goto oom4;
 	}
@@ -55,7 +55,7 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 	wsi->sock = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (wsi->sock < 0) {
-		fprintf(stderr, "Unable to open socket\n");
+		lws_log(LWS_LOG_WARNING, "Unable to open socket");
 		goto oom4;
 	}
 
@@ -79,11 +79,11 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 
 	if (connect(wsi->sock, (struct sockaddr *)&server_addr,
 					      sizeof(struct sockaddr)) == -1)  {
-		fprintf(stderr, "Connect failed\n");
+		lws_log(LWS_LOG_WARNING, "Connect failed");
 		goto oom4;
 	}
 
-	fprintf(stderr, "connected\n");
+	lws_log(LWS_LOG_DEBUG, "connected");
 
 	/* into fd -> wsi hashtable */
 
@@ -111,7 +111,7 @@ struct libwebsocket * __libwebsocket_client_connect_2(
 #else
 			close(wsi->sock);
 #endif
-			fprintf(stderr, "ERROR writing to proxy socket\n");
+			lws_log(LWS_LOG_ERROR, "ERROR writing to proxy socket");
 			goto bail1;
 		}
 
@@ -190,7 +190,7 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 	int handled;
 #ifndef LWS_OPENSSL_SUPPORT
 	if (ssl_connection) {
-		fprintf(stderr, "libwebsockets not configured for ssl\n");
+		lws_log(LWS_LOG_WARNING, "libwebsockets not configured for ssl");
 		return NULL;
 	}
 #endif
@@ -209,6 +209,7 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 	wsi->ietf_spec_revision = ietf_version_or_minus_one;
 	wsi->name_buffer_pos = 0;
 	wsi->user_space = NULL;
+    wsi->is_user_space_external = 0;
 	wsi->state = WSI_STATE_CLIENT_UNCONNECTED;
 	wsi->pings_vs_pongs = 0;
 	wsi->protocol = NULL;
@@ -265,8 +266,8 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 		wsi->xor_mask = xor_mask_05;
 		break;
 	default:
-		fprintf(stderr,
-			"Client ietf version %d not supported\n",
+		lws_log(LWS_LOG_WARNING,
+			"Client ietf version %d not supported",
 						       wsi->ietf_spec_revision);
 		goto oom4;
 	}
@@ -304,8 +305,8 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 	}
 
 	if (handled) {
-		fprintf(stderr, "libwebsocket_client_connect: "
-							 "ext handling conn\n");
+		lws_log(LWS_LOG_DEBUG, "libwebsocket_client_connect: "
+							 "ext handling conn");
 
 		libwebsocket_set_timeout(wsi,
 			PENDING_TIMEOUT_AWAITING_EXTENSION_CONNECT_RESPONSE, 5);
@@ -314,7 +315,7 @@ libwebsocket_client_connect(struct libwebsocket_context *context,
 		return wsi;
 	}
 
-	fprintf(stderr, "libwebsocket_client_connect: direct conn\n");
+	lws_log(LWS_LOG_DEBUG, "libwebsocket_client_connect: direct conn");
 
 	return __libwebsocket_client_connect_2(context, wsi);
 
