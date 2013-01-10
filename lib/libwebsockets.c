@@ -1123,8 +1123,8 @@ lws_client_interpret_server_handshake(struct libwebsocket_context *context,
 		}
 
 		strtolower(wsi->utf8_token[WSI_TOKEN_HTTP].token);
-		if (strcmp(wsi->utf8_token[WSI_TOKEN_HTTP].token,
-			"101 websocket protocol handshake")) {
+		if (strncmp(wsi->utf8_token[WSI_TOKEN_HTTP].token,
+			                                    "101", 3)) {
 			lws_log(LWS_LOG_INFO, "libwebsocket_client_handshake "
 				"server sent bad HTTP response '%s'",
 				wsi->utf8_token[WSI_TOKEN_HTTP].token);
@@ -1178,8 +1178,7 @@ lws_client_interpret_server_handshake(struct libwebsocket_context *context,
 	 */
 
 	strtolower(wsi->utf8_token[WSI_TOKEN_HTTP].token);
-	if (strcmp(wsi->utf8_token[WSI_TOKEN_HTTP].token,
-					   "101 switching protocols")) {
+	if (strncmp(wsi->utf8_token[WSI_TOKEN_HTTP].token, "101", 3)) {
 		lws_log(LWS_LOG_INFO, "libwebsocket_client_handshake "
 				"server sent bad HTTP response '%s'",
 				 wsi->utf8_token[WSI_TOKEN_HTTP].token);
