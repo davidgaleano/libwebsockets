@@ -56,6 +56,7 @@ extern "C" {
 enum libwebsocket_context_options {
 	LWS_SERVER_OPTION_DEFEAT_CLIENT_MASK = 1,
 	LWS_SERVER_OPTION_REQUIRE_VALID_OPENSSL_CLIENT_CERT = 2,
+	LWS_SERVER_OPTION_SKIP_SERVER_CANONICAL_NAME = 4,
 };
 
 enum libwebsocket_callback_reasons {
