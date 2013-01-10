@@ -1267,8 +1267,10 @@ select_protocol:
 	while (context->protocols[n].callback && !wsi->protocol) {  /* Stop after finding first one?? */
 		if (strcmp(wsi->utf8_token[WSI_TOKEN_PROTOCOL].token,
 					   context->protocols[n].name) == 0)
+		{
 			wsi->protocol = &context->protocols[n];
 			wsi->c_callback = wsi->protocol->callback;
+		}
 		n++;
 	}
 
