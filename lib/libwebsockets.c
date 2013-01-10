@@ -2527,6 +2527,7 @@ libwebsocket_create_context(int port, const char *interf,
 			       struct libwebsocket_extension *extensions,
 			       const char *ssl_cert_filepath,
 			       const char *ssl_private_key_filepath,
+			       const char *ssl_ca_filepath,
 			       int gid, int uid, unsigned int options)
 {
 	int n;
@@ -2738,15 +2739,27 @@ libwebsocket_create_context(int port, const char *interf,
 		}
 
 		/* openssl init for cert verification (for client sockets) */
-
-		if (!SSL_CTX_load_verify_locations(
-					context->ssl_client_ctx, NULL,
-						      LWS_OPENSSL_CLIENT_CERTS))
-			lws_log(LWS_LOG_ERROR,
-			    "Unable to load SSL Client certs from %s "
-			    "(set by --with-client-cert-dir= in configure) -- "
-				" client ssl isn't going to work",
-						      LWS_OPENSSL_CLIENT_CERTS);
+		if (!ssl_ca_filepath)
+		{
+			if (!SSL_CTX_load_verify_locations(
+						context->ssl_client_ctx, NULL,
+								  LWS_OPENSSL_CLIENT_CERTS))
+				lws_log(LWS_LOG_ERROR,
+					"Unable to load SSL Client certs from %s "
+					"(set by --with-client-cert-dir= in configure) -- "
+					" client ssl isn't going to work",
+								  LWS_OPENSSL_CLIENT_CERTS);
+		}
+		else
+		{
+			if (!SSL_CTX_load_verify_locations(
+						context->ssl_client_ctx, ssl_ca_filepath,
+								  NULL))
+				lws_log(LWS_LOG_ERROR,
+					"Unable to load SSL Client certs file from %s -- "
+					" client ssl isn't going to work",
+								  ssl_ca_filepath);
+		}
 
 		/*
 		 * callback allowing user code to load extra verification certs
