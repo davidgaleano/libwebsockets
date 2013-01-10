@@ -35,7 +35,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@EXT_GOOGLE_MUX_TRUE@am__append_1 = extension-x-google-mux.c
+@EXT_GOOGLE_MUX_TRUE@am__append_1 = extension-x-google-mux.c extension-x-google-mux.h
 @LIBCRYPTO_FALSE@am__append_2 = md5.c sha-1.c
 subdir = lib
 DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
@@ -81,8 +81,10 @@ libwebsockets_la_LIBADD =
 am__dist_libwebsockets_la_SOURCES_DIST = libwebsockets.c handshake.c \
 	parsers.c libwebsockets.h base64-decode.c client-handshake.c \
 	extension.c extension-deflate-frame.c \
-	extension-deflate-stream.c private-libwebsockets.h \
-	extension-x-google-mux.c md5.c sha-1.c
+	extension-deflate-frame.h extension-deflate-stream.c \
+	extension-deflate-stream.h private-libwebsockets.h \
+	extension-x-google-mux.c extension-x-google-mux.h md5.c \
+	sha-1.c
 @EXT_GOOGLE_MUX_TRUE@am__objects_1 = libwebsockets_la-extension-x-google-mux.lo
 @LIBCRYPTO_FALSE@am__objects_2 = libwebsockets_la-md5.lo \
 @LIBCRYPTO_FALSE@	libwebsockets_la-sha-1.lo
@@ -235,12 +237,13 @@ lib_LTLIBRARIES = libwebsockets.la
 include_HEADERS = libwebsockets.h
 dist_libwebsockets_la_SOURCES = libwebsockets.c handshake.c parsers.c \
 	libwebsockets.h base64-decode.c client-handshake.c extension.c \
-	extension-deflate-frame.c extension-deflate-stream.c \
+	extension-deflate-frame.c extension-deflate-frame.h \
+	extension-deflate-stream.c extension-deflate-stream.h \
 	private-libwebsockets.h $(am__append_1) $(am__append_2)
 libwebsockets_la_CFLAGS := -rdynamic -fPIC -Wall -Werror -std=gnu99 -pedantic -c \
 	-DDATADIR=\"@datadir@\" -DLWS_OPENSSL_CLIENT_CERTS=\"@clientcertdir@\"
 
-libwebsockets_la_LDFLAGS = -lz -version-info 0:3
+libwebsockets_la_LDFLAGS = -lz -version-info 0:4
 all: all-am
 
 .SUFFIXES:
