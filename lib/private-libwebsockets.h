@@ -43,6 +43,8 @@
 #include "websock-w32.h"
 #include "gettimeofday.h"
 
+#define strcasecmp stricmp
+
 #else
 
 #include <sys/types.h>
@@ -70,8 +72,6 @@
 
 
 #include "libwebsockets.h"
-
-#define strcasecmp stricmp
 
 #if 0
 #define DEBUG
