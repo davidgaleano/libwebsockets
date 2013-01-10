@@ -3250,6 +3250,12 @@ libwebsocket_is_final_fragment(struct libwebsocket *wsi)
 	return wsi->final;
 }
 
+unsigned char
+libwebsocket_get_reserved_bits(struct libwebsocket *wsi)
+{
+	return wsi->rsv;
+}
+
 /**
  * libwebsockets_set_log_callback() - Sets the callback to be called
  *                  for logging.

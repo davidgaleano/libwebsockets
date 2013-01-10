@@ -107,6 +107,8 @@ enum libwebsocket_extension_callback_reasons {
 	LWS_EXT_CALLBACK_1HZ,
 	LWS_EXT_CALLBACK_REQUEST_ON_WRITEABLE,
 	LWS_EXT_CALLBACK_IS_WRITEABLE,
+	LWS_EXT_CALLBACK_PAYLOAD_TX,
+	LWS_EXT_CALLBACK_PAYLOAD_RX,
 };
 
 enum libwebsocket_write_protocol {
@@ -696,7 +698,7 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
  */
 
 #define LWS_SEND_BUFFER_PRE_PADDING (4 + 10 + (2 * MAX_MUX_RECURSION))
-#define LWS_SEND_BUFFER_POST_PADDING 1
+#define LWS_SEND_BUFFER_POST_PADDING 4
 
 LWS_EXTERN int
 libwebsocket_write(struct libwebsocket *wsi, unsigned char *buf, size_t len,
@@ -735,6 +737,9 @@ libwebsocket_get_socket_fd(struct libwebsocket *wsi);
 
 LWS_EXTERN int
 libwebsocket_is_final_fragment(struct libwebsocket *wsi);
+
+LWS_EXTERN unsigned char
+libwebsocket_get_reserved_bits(struct libwebsocket *wsi);
 
 LWS_EXTERN void *
 libwebsocket_ensure_user_space(struct libwebsocket *wsi);
