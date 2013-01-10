@@ -1846,17 +1846,26 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
 		}
 
 		if (wsi->use_ssl) {
-			if (SSL_connect(wsi->ssl) <= 0) {
-
-				/*
-				 * retry if new data comes until we
-				 * run into the connection timeout or win
-				 */
-
-				lws_log(LWS_LOG_ERROR, "SSL connect error %s",
-					ERR_error_string(ERR_get_error(),
-								  ssl_err_buf));
-				return 0;
+			while (1)
+			{
+				n = SSL_connect(wsi->ssl);
+				if (n <= 0) {
+					/*
+					 * retry if new data comes until we
+					 * run into the connection timeout or win
+					 */
+					n = SSL_get_error(wsi->ssl, n);
+					if (n != SSL_ERROR_WANT_READ &&
+						n != SSL_ERROR_WANT_WRITE) {
+						lws_log(LWS_LOG_ERROR, "SSL connect error %s",
+							ERR_error_string(n, ssl_err_buf));
+						libwebsocket_close_and_free_session(context,
+							wsi, LWS_CLOSE_STATUS_NOSTATUS);
+						return 1;
+					}
+				} else {
+					break;
+				}
 			}
 
 			n = SSL_get_verify_result(wsi->ssl);
@@ -1887,7 +1896,7 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
 	#endif
 			n = send(wsi->sock, pkt, p - pkt, 0);
 
-		if (n < 0) {
+		if (n <= 0) {
 			lws_log(LWS_LOG_ERROR, "ERROR writing to client socket");
 			libwebsocket_close_and_free_session(context, wsi,
 						     LWS_CLOSE_STATUS_NOSTATUS);

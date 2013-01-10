@@ -1445,7 +1445,7 @@ int lws_issue_raw(struct libwebsocket *wsi, unsigned char *buf, size_t len)
 #ifdef LWS_OPENSSL_SUPPORT
 	if (wsi->ssl) {
 		n = SSL_write(wsi->ssl, buf, len);
-		if (n < 0) {
+		if (n <= 0) {
 			lws_log(LWS_LOG_ERROR,
 				   "ERROR writing to socket");
 			return -1;
