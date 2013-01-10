@@ -1568,7 +1568,7 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
 		accept_fd  = accept(pollfd->fd, (struct sockaddr *)&cli_addr,
 								       &clilen);
 		if (accept_fd < 0) {
-			lws_log(LWS_LOG_ERROR, "ERROR on accept");
+			lws_log(LWS_LOG_ERROR, "ERROR on accept: %s", strerror(errno));
 			break;
 		}
 
