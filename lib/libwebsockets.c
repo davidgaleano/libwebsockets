@@ -2813,8 +2813,8 @@ libwebsocket_create_context(int port, const char *interf,
 		/* openssl init for server sockets */
 
 		/* set the local certificate from CertFile */
-		n = SSL_CTX_use_certificate_file(context->ssl_ctx,
-					ssl_cert_filepath, SSL_FILETYPE_PEM);
+		n = SSL_CTX_use_certificate_chain_file(context->ssl_ctx,
+					ssl_cert_filepath);
 		if (n != 1) {
 			lws_log(LWS_LOG_ERROR, "problem getting cert '%s': %s",
 				ssl_cert_filepath,
