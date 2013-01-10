@@ -24,6 +24,8 @@
 #ifdef WIN32
 #define sys_nerr _sys_nerr
 #define sys_errlist _sys_errlist
+#include <tchar.h>
+#include <io.h>
 #else
 #include <ifaddrs.h>
 #include <sys/un.h>
@@ -450,7 +452,9 @@ libwebsockets_get_peer_addresses(int fd, char *name, int name_len,
 	char ip[128];
 	unsigned char *p;
 	int n;
-	struct sockaddr_un *un;
+#ifdef AF_LOCAL
+    struct sockaddr_un *un;
+#endif
 
 	rip[0] = '\0';
 	name[0] = '\0';
@@ -969,7 +973,7 @@ libwebsockets_generate_client_handshake(struct libwebsocket_context *context,
 	p += strlen(wsi->key_b64);
 	p += sprintf(p, "\x0d\x0a");
 	if (wsi->c_origin)
-		p += sprintf(p, "Sec-WebSocket-Origin: %s\x0d\x0a",
+		    p += sprintf(p, "Sec-WebSocket-Origin: %s\x0d\x0a",
 							 wsi->c_origin);
 	if (wsi->c_protocol)
 		p += sprintf(p, "Sec-WebSocket-Protocol: %s\x0d\x0a",
@@ -1054,7 +1058,7 @@ libwebsockets_generate_client_handshake(struct libwebsocket_context *context,
 
 issue_hdr:
 
-	//lws_log(LWS_LOG_DEBUG, pkt);
+	lws_log(LWS_LOG_DEBUG, pkt);
 
 	/* done with these now */
 
@@ -2536,7 +2540,7 @@ libwebsocket_create_context(int port, const char *interf,
 			return NULL;
 		}
 
-        wsdll = GetModuleHandle("Ws2_32.dll");
+        wsdll = GetModuleHandle(_T("Ws2_32.dll"));
         if (wsdll)
         {
             poll = (PFNWSAPOLL)GetProcAddress(wsdll, "WSAPoll");
