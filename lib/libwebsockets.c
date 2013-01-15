@@ -1641,27 +1641,7 @@ libwebsocket_service_fd(struct libwebsocket_context *context,
 
 			SSL_set_fd(new_wsi->ssl, accept_fd);
 
-			n = SSL_accept(new_wsi->ssl);
-			if (n != 1) {
-				/*
-				 * browsers seem to probe with various
-				 * ssl params which fail then retry
-				 * and succeed
-				 */
-				debug("SSL_accept failed skt %u: %s\n",
-				      pollfd->fd,
-				      ERR_error_string(SSL_get_error(
-				      new_wsi->ssl, n), NULL));
-				SSL_free(
-				       new_wsi->ssl);
-				free(new_wsi);
-#ifdef WIN32
-				closesocket(accept_fd);
-#else
-				close(accept_fd);
-#endif
-				break;
-			}
+			SSL_set_accept_state(new_wsi->ssl);
 
 			debug("accepted new SSL conn  "
 			      "port %u on fd=%d SSL ver %s\n",
@@ -2061,6 +2041,13 @@ read_pending:
 					   recv(pollfd->fd, buf, sizeof buf, 0);
 
 		if (eff_buf.token_len < 0) {
+
+			if (wsi->ssl) {
+				n = SSL_get_error(wsi->ssl, eff_buf.token_len);
+				if (n == SSL_ERROR_WANT_READ)
+					return 0;
+			}
+
 			lws_log(LWS_LOG_INFO, "Socket read returned %d",
 							    eff_buf.token_len);
 			if (errno != EINTR)
